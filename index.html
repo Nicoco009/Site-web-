@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Carte de Vœux 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:system-ui, Arial;
+    background:linear-gradient(145deg,#05001a,#3a007a,#ff0055);
+    color:#fff;
+    overflow:hidden;
+}
+
+/* Bouton partager */
+#share{
+    position:fixed;
+    top:8px;
+    left:8px;
+    z-index:10;
+    background:#ffffff22;
+    border:1px solid #fff;
+    color:#fff;
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:13px;
+    cursor:pointer;
+}
+
+/* Carte principale */
+.card{
+    max-width:520px;
+    margin:80px auto;
+    padding:25px;
+    background:rgba(0,0,0,0.65);
+    border-radius:22px;
+    text-align:center;
+    box-shadow:0 0 30px rgba(0,0,0,0.8);
+    position:relative;
+    z-index:5;
+}
+
+h1{
+    margin-top:0;
+    color:#ffeb3b;
+    font-size:32px;
+}
+
+input, textarea, button{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border-radius:14px;
+    border:none;
+    font-size:15px;
+}
+
+button.send{
+    background:#25D366;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+}
+
+/* Notation */
+#rating{
+    display:none;
+    margin-top:20px;
+}
+.stars{
+    font-size:34px;
+}
+.star{
+    cursor:pointer;
+    color:#444;
+    transition:0.2s;
+}
+.star.active{
+    color:gold;
+    transform:scale(1.25);
+}
+#thanks{
+    margin-top:15px;
+    font-size:18px;
+    color:#00ffcc;
+}
+
+/* Contact */
+.contact{
+    margin-top:25px;
+    padding-top:15px;
+    border-top:1px dashed #fff;
+}
+
+/* Emojis flottants */
+.float{
+    position:fixed;
+    font-size:26px;
+    pointer-events:none;
+    opacity:0.9;
+}
+</style>
+</head>
+
+<body>
+
+<button id="share" onclick="shareSite()">Partager</button>
+
+<div class="card">
+    <h1>🎆 Bonne Année 2026 🎆</h1>
+    <p>Envoyez vos vœux de fin d’année sur WhatsApp</p>
+
+    <input id="destName" placeholder="Nom du destinataire">
+    <input id="destPhone" placeholder="Numéro WhatsApp (ex: 509XXXXXXXX)">
+    <textarea id="wish" placeholder="Votre message de vœux"></textarea>
+    <input id="senderName" placeholder="Votre nom (pour la note)">
+
+    <button class="send" onclick="sendWhatsApp()">Envoyer sur WhatsApp</button>
+
+    <div id="rating">
+        <h3>Notez le site 🌟</h3>
+        <div class="stars">
+            <span class="star" data="1">★</span>
+            <span class="star" data="2">★</span>
+            <span class="star" data="3">★</span>
+            <span class="star" data="4">★</span>
+            <span class="star" data="5">★</span>
+        </div>
+        <textarea id="comment" placeholder="Votre commentaire"></textarea>
+        <button onclick="saveRating()">Envoyer la note</button>
+    </div>
+
+    <div id="thanks"></div>
+
+    <div class="contact">
+        <p>Me contacter :</p>
+        <button onclick="contactMe()">💬 WhatsApp</button>
+    </div>
+</div>
+
+<script>
+// Partage
+function shareSite(){
+    if(navigator.share){
+        navigator.share({title:"Carte de vœux 2026",url:location.href});
+    }else{
+        navigator.clipboard.writeText(location.href);
+        alert("Lien copié !");
+    }
+}
+
+// Envoi WhatsApp
+function sendWhatsApp(){
+    let n=document.getElementById("destName").value.trim();
+    let p=document.getElementById("destPhone").value.trim();
+    let m=document.getElementById("wish").value.trim();
+    if(!n||!p||!m){alert("Veuillez remplir tous les champs");return;}
+    let txt=`🎉 Bonne Année 2026 ${n} 🎉\n\n${m}`;
+    window.open("https://wa.me/"+p+"?text="+encodeURIComponent(txt));
+    document.getElementById("rating").style.display="block";
+}
+
+// Notation
+let rate=0;
+document.querySelectorAll(".star").forEach(s=>{
+    s.onclick=()=>{
+        rate=s.getAttribute("data");
+        document.querySelectorAll(".star").forEach(x=>x.classList.remove("active"));
+        for(let i=0;i<rate;i++)document.querySelectorAll(".star")[i].classList.add("active");
+    }
+});
+
+function saveRating(){
+    let name=document.getElementById("senderName").value.trim();
+    if(rate==0||!name){alert("Nom ou note manquant");return;}
+    localStorage.setItem("rating_"+Date.now(),JSON.stringify({
+        name:name,
+        rate:rate,
+        comment:document.getElementById("comment").value
+    }));
+    document.getElementById("rating").style.display="none";
+    document.getElementById("thanks").innerText="Merci pour votre avis 🙏";
+}
+
+// Contact WhatsApp (NUMÉRO FIXÉ)
+function contactMe(){
+    window.open("https://wa.me/50932969900?text=Bonjour%20je%20vous%20contacte");
+}
+
+// Emojis + 2026 flottants
+const items=["😎","✨","💫","🌟","🫶🏻","🎉","🎊","🎇","🎆","2","0","2","6"];
+for(let i=0;i<30;i++){
+    let e=document.createElement("div");
+    e.className="float";
+    e.textContent=items[Math.floor(Math.random()*items.length)];
+    e.style.left=Math.random()*innerWidth+"px";
+    e.style.top=Math.random()*innerHeight+"px";
+    e.vx=(Math.random()-0.5)*0.6;
+    e.vy=(Math.random()-0.5)*0.6;
+    e.style.color=`hsl(${Math.random()*360},100%,70%)`;
+    document.body.appendChild(e);
+}
+
+function animateFloat(){
+    document.querySelectorAll(".float").forEach(f=>{
+        let x=parseFloat(f.style.left)+f.vx;
+        let y=parseFloat(f.style.top)+f.vy;
+        if(x<0)x=innerWidth;if(x>innerWidth)x=0;
+        if(y<0)y=innerHeight;if(y>innerHeight)y=0;
+        f.style.left=x+"px";f.style.top=y+"px";
+    });
+    requestAnimationFrame(animateFloat);
+}
+animateFloat();
+</script>
+
+</body>
+</html>
